@@ -65,8 +65,9 @@
               console.log(rsp.data);
               // Display the shortest path
               if (rsp.data.persons.length < length) {
+                $('.path').empty();
                 length = rsp.data.persons.length;
-                $('.number').text(length-1);
+                $('.number').text(length);
 
                 // Display relationship path
                 for (var i=0; i<rsp.data.persons.length; i++) {
