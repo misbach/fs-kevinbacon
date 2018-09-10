@@ -5,8 +5,7 @@
     <title>Kevin Bacon</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
     <style type="text/css">
-    	#accordion { width: 450px; }
-    	h3 { margin-top: 40px; }
+    	h3 { margin-top: 40px; margin-bottom: 40px; }
       ul { list-style: none; }
       .portrait { width: 32px; border-radius: 50%; margin-right: 5px; }
       li { margin-bottom: 5px; }
@@ -41,7 +40,6 @@
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/fs-js-lite@latest/dist/FamilySearch.min.js"></script>
-
     <script type="text/javascript">
       var fs = new FamilySearch({
         environment: 'production',
@@ -54,10 +52,8 @@
       $('.login').click(function() { fs.oauthRedirect() })
 
       // Finish oauth and get relationships
-      fs.oauthResponse(function(r) {
-        if (fs.accessToken != "") {
+      fs.oauthResponse(function() {
           $('.results').show();
-          $('.auth').hide();
 
           ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
             fs.get("/platform/tree/my-relationships?personDetails=true&pid="+key, 
@@ -77,8 +73,6 @@
                 }
             });
           });
-        }
-
       });
     </script>
   </body>
