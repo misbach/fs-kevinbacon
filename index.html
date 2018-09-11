@@ -51,7 +51,6 @@
       else {
         fs.get("/platform/users/current", function(error, response) {
           if (response.statusCode == 401) fs.oauthRedirect();
-          fs.user = response.data.users[0];
           getRelationships();
         });
       }
@@ -70,7 +69,8 @@
                 // Display relationship path
                 for (var i=0; i<rsp.data.persons.length; i++) {
                   let li = document.createElement("li");
-                  li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://fsicons.org/wp-content/uploads/2014/10/gender-unknown-x-large.png"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>';
+                  let token = '&access_token='+fs.accessToken;
+                  li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://fsicons.org/wp-content/uploads/2014/10/gender-unknown-x-large.png'+token+'"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>';
                   document.getElementById("path").appendChild(li);
                 }
                 // Display Kevin last
