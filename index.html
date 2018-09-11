@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8">
     <title>Kevin Bacon</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
     <style type="text/css">
     	h3 { margin-top: 40px; margin-bottom: 40px; }
       ul { list-style: none; }
-      .portrait { width: 32px; border-radius: 50%; margin-right: 5px; }
+      .portrait { width: 32px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
       li { margin-bottom: 5px; }
       .page { width: 600px; margin: auto; }
       .github { position: absolute; right: 0px; top: 0px; }
+      body { font-size: 18px; font-family: "Helvetica Neue",Arial,sans-serif; }
     </style>
   </head>
   <body>
@@ -24,24 +24,22 @@
 
       <!-- Show Results -->
       <div class="results">
-        <h3>Bacon Number: <span class="number"></span></h3>
+        <h3>Bacon Number: <span id="number"></span></h3>
         <strong>Your relationship with Kevin Bacon</strong>
-  	    <div><ul class="path"></ul></div>
+  	    <div><ul id="path"></ul></div>
       </div>
 
     </div>
     <a href="https://github.com/misbach/fs-kevinbacon"><img src="forkme.png" class="github"></a>
 
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/fs-js-lite@latest/dist/FamilySearch.min.js"></script>
     <script type="text/javascript">
       var fs = new FamilySearch({
         environment: 'production',
         appKey: 'a02j000000KTRjpAAH',
         saveAccessToken: true,
-        redirectUri: 'https://misbach.github.io/fs-kevinbacon/'
+        // redirectUri: 'https://misbach.github.io/fs-kevinbacon/'
+        redirectUri: 'http://localhost:5000'
       });
       let length = 99;
 
@@ -51,26 +49,39 @@
       });
       // Login if not authenticated
       if (!oauthResponseState && !fs.getAccessToken()) fs.oauthRedirect();
+      else {
+        fs.get("/platform/users/current", function(error, response) {
+          if (response.statusCode == 401) fs.oauthRedirect();
+          fs.user = response.data.users[0];
+          getRelationships();
+        });
+      }
 
       // Get relationships
-      ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
-        fs.get("/platform/tree/my-relationships?personDetails=true&pid="+key, 
-          function(err, rsp) {
-            // Display the shortest path
-            if (rsp.data.persons.length < length) {
-              $('.path').empty();
-              length = rsp.data.persons.length;
-              $('.number').text(length);
+      function getRelationships() {        
+        ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
+          fs.get("/platform/tree/my-relationships?personDetails=true&pid="+key, 
+            function(err, rsp) {
+              // Display the shortest path
+              if (rsp.data.persons.length < length) {
+                length = rsp.data.persons.length;
+                document.getElementById('path').innerHTML = "";
+                document.getElementById('number').innerHTML = length;
 
-              // Display relationship path
-              for (var i=0; i<rsp.data.persons.length; i++) {
-                $('.path').append('<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://fsicons.org/wp-content/uploads/2014/10/gender-unknown-x-large.png"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>');
+                // Display relationship path
+                for (var i=0; i<rsp.data.persons.length; i++) {
+                  let li = document.createElement("li");
+                  li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://fsicons.org/wp-content/uploads/2014/10/gender-unknown-x-large.png"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>';
+                  document.getElementById("path").appendChild(li);
+                }
+                // Display Kevin last
+                let li = document.createElement("li");
+                li.innerHTML = '<li><img class="portrait" src="icon.jpg">Kevin Bacon</li>';
+                document.getElementById("path").appendChild(li);
               }
-              // Display Kevin last
-              $('.path').append('<li><img class="portrait" src="icon.jpg">Kevin Bacon</li>');
-            }
+          });
         });
-      });
+      }
     </script>
   </body>
 </html>
