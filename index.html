@@ -9,7 +9,6 @@
       ul { list-style: none; }
       .portrait { width: 32px; border-radius: 50%; margin-right: 5px; }
       li { margin-bottom: 5px; }
-      .results { display: none; }
       .page { width: 600px; margin: auto; }
       .github { position: absolute; right: 0px; top: 0px; }
     </style>
@@ -22,11 +21,6 @@
 	      <h1>Six Degrees from Kevin Bacon</h1>
     	</center>
       <p>How many degrees are you from <a href="http://www.baconbros.com/" target="_blank">Kevin Bacon</a>? This is based on the game of Six Degrees of Separation, the idea that all living things and everything else in the world are six or fewer steps away from each other so that a chain of "a friend of a friend" statements can be made to connect any two people in a maximum of six steps. It was originally set out by <a href="https://en.wikipedia.org/wiki/Frigyes_Karinthy" target="_blank">Frigyes Karinthy</a> in 1929.</p>
-
-      <!-- Login -->
-      <div class="auth text-center">
-        <button class="login btn btn-primary">Login</button>
-      </div>
 
       <!-- Show Results -->
       <div class="results">
@@ -46,35 +40,36 @@
       var fs = new FamilySearch({
         environment: 'production',
         appKey: 'a02j000000KTRjpAAH',
+        saveAccessToken: true,
         redirectUri: 'https://misbach.github.io/fs-kevinbacon/'
       });
       let length = 99;
 
-      // Login
-      $('.login').click(function() { fs.oauthRedirect() })
+      // Auto-login: Handle an OAuth2 state
+      var oauthResponseState = fs.oauthResponse(function(error, response) {
+        if (response.statusCode === 200) window.location = window.location.pathname;
+      });
+      // Login if not authenticated
+      if (!oauthResponseState && !fs.getAccessToken()) fs.oauthRedirect();
 
-      // Finish oauth and get relationships
-      fs.oauthResponse(function() {
-          $('.results').show();
+      // Get relationships
+      ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
+        fs.get("/platform/tree/my-relationships?personDetails=true&pid="+key, 
+          function(err, rsp) {
+            // Display the shortest path
+            if (rsp.data.persons.length < length) {
+              $('.path').empty();
+              length = rsp.data.persons.length;
+              $('.number').text(length);
 
-          ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
-            fs.get("/platform/tree/my-relationships?personDetails=true&pid="+key, 
-              function(err, rsp) {
-                // Display the shortest path
-                if (rsp.data.persons.length < length) {
-                  $('.path').empty();
-                  length = rsp.data.persons.length;
-                  $('.number').text(length);
-
-                  // Display relationship path
-                  for (var i=0; i<rsp.data.persons.length; i++) {
-                    $('.path').append('<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://fsicons.org/wp-content/uploads/2014/10/gender-unknown-x-large.png"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>');
-                  }
-                  // Display Kevin last
-                  $('.path').append('<li><img class="portrait" src="icon.jpg">Kevin Bacon</li>');
-                }
-            });
-          });
+              // Display relationship path
+              for (var i=0; i<rsp.data.persons.length; i++) {
+                $('.path').append('<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://fsicons.org/wp-content/uploads/2014/10/gender-unknown-x-large.png"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>');
+              }
+              // Display Kevin last
+              $('.path').append('<li><img class="portrait" src="icon.jpg">Kevin Bacon</li>');
+            }
+        });
       });
     </script>
   </body>
