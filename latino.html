@@ -51,8 +51,8 @@
 
       // Get relationships
       var flag = 0;
-      var pids = ["L2N8-NL6","L2N8-NR7","LB9H-PK4","L4Q5-1R1","LZNF-LWS","9MJP-SXF","LZYP-XQM","L782-2WX","L4TK-WZL","LC1H-LCH","KGMZ-5QS","LCPB-PNQ","MD4F-B84","LC1C-6NK","LC5R-Z1L","LH7M-QFX","LH17-95K","2C1M-BN9","LR15-W2P","L4BH-43N","LYTW-9D4","LZTW-7SL"];
-      // var pids = ["LB9H-PK4","L4Q5-1R1","LZNF-LWS","9MJP-SXF","LZYP-XQM","L782-2WX","L4TK-WZL","LC1H-LCH","KGMZ-5QS","LCPB-PNQ","MD4F-B84","LC1C-6NK","LC5R-Z1L","LH7M-QFX","LH17-95K","2C1M-BN9","LR15-W2P","L4BH-43N","LYTW-9D4","LZTW-7SL"];
+      // var pids = ["L2N8-NL6","L2N8-NR7","LB9H-PK4","L4Q5-1R1","LZNF-LWS","9MJP-SXF","LZYP-XQM","L782-2WX","L4TK-WZL","LC1H-LCH","KGMZ-5QS","LCPB-PNQ","MD4F-B84","LC1C-6NK","LC5R-Z1L","LH7M-QFX","LH17-95K","2C1M-BN9","LR15-W2P","L4BH-43N","LYTW-9D4","LZTW-7SL"];
+      var pids = ["LB9H-PK4","L4Q5-1R1","LZNF-LWS","9MJP-SXF","LZYP-XQM","L782-2WX","L4TK-WZL","LC1H-LCH","KGMZ-5QS","LCPB-PNQ","MD4F-B84","LC1C-6NK","LC5R-Z1L","LH7M-QFX","LH17-95K","2C1M-BN9","LR15-W2P","L4BH-43N","LYTW-9D4","LZTW-7SL"];
       function getRelationships() {
         pids.forEach(function(key) {
           fs.get("/platform/tree/my-relationships?pid="+key, function(err, rsp) {
