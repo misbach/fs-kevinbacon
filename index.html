@@ -57,7 +57,7 @@
       }
 
       // Get relationships
-      function getRelationships() {        
+      function getRelationships() {         
         ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
           fs.get("/platform/tree/my-relationships?pid="+key, 
             function(err, rsp) {
@@ -71,7 +71,27 @@
                 for (var i=0; i<rsp.data.persons.length; i++) {
                   let li = document.createElement("li");
                   let token = '&access_token='+fs.accessToken;
-                  li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://misbach.github.io/fs-kevinbacon/person.png'+token+'"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>';
+                  let commonAncestor = false;
+                  // make sure it won't overrun
+                  if(i != length - 1 && i != 0) {
+                    // check the mother id and the next mother id - if they are the same then this is the common ancestor
+                    if((rsp.data.childAndParentsRelationships[i].hasOwnProperty('mother') && rsp.data.childAndParentsRelationships[i-1].hasOwnProperty('mother')) &&
+                      (rsp.data.childAndParentsRelationships[i].mother.resourceId === rsp.data.childAndParentsRelationships[i-1].mother.resourceId)) {
+                        commonAncestor = true;
+                    } 
+                    // check the father id and the next father id - if they are the same then this is the common ancestor
+                    else if((rsp.data.childAndParentsRelationships[i].hasOwnProperty('father') && rsp.data.childAndParentsRelationships[i-1].hasOwnProperty('father')) && 
+                      (rsp.data.childAndParentsRelationships[i].father.resourceId === rsp.data.childAndParentsRelationships[i-1].father.resourceId)) {
+                        commonAncestor = true;
+                    } else {
+                      commonAncestor = false;
+                    }
+                  }
+                  if(commonAncestor) {
+                    li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://misbach.github.io/fs-kevinbacon/person.png'+token+'"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a> ***** Common ancestor</li>';
+                  } else {
+                    li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://misbach.github.io/fs-kevinbacon/person.png'+token+'"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>';
+                  }
                   document.getElementById("path").appendChild(li);
                 }
                 // Display Kevin last
