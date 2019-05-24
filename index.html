@@ -52,14 +52,15 @@
       else {
         fs.get("/platform/users/current", function(error, response) {
           if (response.statusCode == 401) fs.oauthRedirect();
-          getRelationships();
+          fs.personId = response.data.users[0].personId;
+          getRelationships2();
         });
       }
 
       // Get relationships
-      function getRelationships() {        
+      function getRelationships() {
         ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
-          fs.get("/platform/tree/my-relationships?pid="+key, 
+          fs.get("/platform/tree/my-relationships?pid="+key,
             function(err, rsp) {
               // Display the shortest path
               if (rsp.data.persons.length < length) {
@@ -72,6 +73,35 @@
                   let li = document.createElement("li");
                   let token = '&access_token='+fs.accessToken;
                   li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.persons[i].id+'/portrait?default=https://misbach.github.io/fs-kevinbacon/person.png'+token+'"><a href="https://www.familysearch.org/tree/person/'+rsp.data.persons[i].id+'" target="_blank">'+rsp.data.persons[i].display.name+'</a></li>';
+                  document.getElementById("path").appendChild(li);
+                }
+                // Display Kevin last
+                let li = document.createElement("li");
+                li.innerHTML = '<li><img class="portrait" src="icon.jpg">Kevin Bacon</li>';
+                document.getElementById("path").appendChild(li);
+              }
+          });
+        });
+      }
+
+      function getRelationships2() {
+        ["L2N8-NL6","L2N8-NR7"].forEach(function(key) {
+          // Override base-URL
+          fs.platformHost = function() { return "https://www.familysearch.org" }
+
+          fs.get("/tree-data/my-relatives/tree-graph-relation/"+fs.personId+"/"+key+"?showApexCoParentEx=true", {headers: {Authorization: 'Bearer '+fs.accessToken}},function(err, rsp) {
+            console.log(rsp.data.data);
+              // Display the shortest path
+              if (rsp.data.data.persons.length < length) {
+                length = rsp.data.data.persons.length;
+                document.getElementById('path').innerHTML = "";
+                document.getElementById('number').innerHTML = length;
+
+                // Display relationship path
+                for (var i=0; i<rsp.data.data.persons.length; i++) {
+                  let li = document.createElement("li");
+                  let token = '&access_token='+fs.accessToken;
+                  li.innerHTML = '<li><img class="portrait" src="https://api.familysearch.org/platform/tree/persons/'+rsp.data.data.persons[i].personId+'/portrait?default=https://misbach.github.io/fs-kevinbacon/person.png'+token+'"><a href="https://www.familysearch.org/tree/person/'+rsp.data.data.persons[i].personId+'" target="_blank">'+rsp.data.data.persons[i].name+'</a></li>';
                   document.getElementById("path").appendChild(li);
                 }
                 // Display Kevin last
