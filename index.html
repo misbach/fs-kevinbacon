@@ -89,7 +89,7 @@
           // Override base-URL
           fs.platformHost = function() { return "https://www.familysearch.org" }
 
-          fs.get("/tree-data/my-relatives/tree-graph-relation/"+fs.personId+"/"+key+"?showApexCoParentEx=true", {headers: {Authorization: 'Bearer '+fs.accessToken}},function(err, rsp) {
+          fs.get("/service/tree/tree-data/my-relatives/tree-graph-relation/"+fs.personId+"/"+key+"?showApexCoParentEx=true", {headers: {Authorization: 'Bearer '+fs.accessToken}},function(err, rsp) {
             console.log(rsp.data.data);
               // Display the shortest path
               if (rsp.data.data.persons.length < length) {
